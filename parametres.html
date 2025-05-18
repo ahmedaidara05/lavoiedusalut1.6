@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paramètres</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="shortcut icon" href="book-icon.png" type="image/png">
+</head>
+<body>
+    <main>
+        <button class="back-button" id="backButton">
+            <ion-icon name="arrow-back"></ion-icon> Retour
+        </button>
+        <aside class="sidebar active" data-sidebar>
+            <div class="sidebar-info">
+                <figure class="avatar-box">
+                    <img src="logo.png" alt="Profil" width="80" id="profilePicture">
+                    <input type="file" id="profilePictureInput" accept="image/*" style="display: none;">
+                    <button class="change-photo-btn" id="changePhotoBtn">Changer la photo</button>
+                </figure>
+                <div class="info-content">
+                    <input type="text" class="name" value="Nom Utilisateur" id="userName">
+                    <p class="title">Membre depuis 2023</p>
+                </div>
+            </div>
+            <div class="sidebar-info-more">
+                <div class="separator"></div>
+                <ul class="contacts-list">
+                    <li class="contact-item">
+                        <div class="icon-box">
+                            <ion-icon name="mail-outline"></ion-icon>
+                        </div>
+                        <div class="contact-info">
+                            <p class="contact-title">Email</p>
+                            <input type="email" class="contact-link" value="utilisateur@example.com" id="userEmail">
+                        </div>
+                    </li>
+                    <li class="contact-item">
+                        <div class="icon-box">
+                            <ion-icon name="phone-portrait-outline"></ion-icon>
+                        </div>
+                        <div class="contact-info">
+                            <p class="contact-title">Téléphone</p>
+                            <input type="tel" class="contact-link" value="+1 (123) 456-7890" id="userPhone">
+                        </div>
+                    </li>
+                    <li class="contact-item">
+                        <div class="icon-box">
+                            <ion-icon name="lock-closed-outline"></ion-icon>
+                        </div>
+                        <div class="contact-info">
+                            <p class="contact-title">Mot de passe</p>
+                            <a href="#" class="contact-link" id="resetPassword">Réinitialiser</a>
+                        </div>
+                    </li>
+                </ul>
+                <div class="separator"></div>
+                <h3 class="h3">Personnalisation</h3>
+                <ul class="contacts-list">
+                    <li class="contact-item">
+                        <div class="icon-box">
+                            <ion-icon name="language-outline"></ion-icon>
+                        </div>
+                        <div class="contact-info">
+                            <p class="contact-title">Langue</p>
+                            <select class="contact-link" id="languageSelect">
+                                <option value="fr">Français</option>
+                                <option value="en">English</option>
+                                <option value="ar">العربية</option>
+                            </select>
+                        </div>
+                    </li>
+                    <li class="contact-item">
+                        <div class="icon-box">
+                            <ion-icon name="text-outline"></ion-icon>
+                        </div>
+                        <div class="contact-info">
+                            <p class="contact-title">Taille du texte</p>
+                            <input type="range" min="10" max="24" value="16" id="textSize">
+                        </div>
+                    </li>
+                    <li class="contact-item">
+                        <div class="icon-box">
+                            <ion-icon name="contrast-outline"></ion-icon>
+                        </div>
+                        <div class="contact-info">
+                            <p class="contact-title">Thème</p>
+                            <select class="contact-link" id="themeSelect">
+                                <option value="light">Clair</option>
+                                <option value="dark">Sombre</option>
+                                <option value="auto">Automatique</option>
+                            </select>
+                        </div>
+                    </li>
+                    <li class="contact-item">
+                        <div class="icon-box">
+                            <ion-icon name="volume-high-outline"></ion-icon>
+                        </div>
+                        <div class="contact-info">
+                            <p class="contact-title">Voix de lecture</p>
+                            <select class="contact-link" id="voiceSelect">
+                                <option value="female">Féminine</option>
+                                <option value="male">Masculine</option>
+                                <option value="neutral">Neutre</option>
+                            </select>
+                        </div>
+                    </li>
+                </ul>
+                <div class="separator"></div>
+                <ul class="social-list">
+                    <li class="social-item"><a href="#" class="social-link" title="Politiques"><ion-icon name="lock-closed-outline"></ion-icon></a></li>
+                    <li class="social-item"><a href="#" class="social-link" title="Infos"><ion-icon name="information-circle-outline"></ion-icon></a></li>
+                    <li class="social-item"><a href="#" class="social-link"><ion-icon name="logo-facebook"></ion-icon></a></li>
+                    <li class="social-item"><a href="#" class="social-link"><ion-icon name="logo-twitter"></ion-icon></a></li>
+                    <li class="social-item"><a href="#" class="social-link"><ion-icon name="logo-instagram"></ion-icon></a></li>
+                </ul>
+            </div>
+        </aside>
+    </main>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script src="firebase.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
