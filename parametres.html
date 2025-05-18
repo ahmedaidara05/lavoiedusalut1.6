@@ -3,23 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paramètres</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <title>Paramètres - La Voie du Salut</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="shortcut icon" href="book-icon.png" type="image/png">
+    <link rel="shortcut icon" href="logo.png" type="image/x-icon">
 </head>
 <body>
     <main>
-        <button class="back-button" id="backButton">
+        <button class="back-btn" id="backBtn">
             <ion-icon name="arrow-back"></ion-icon> Retour
         </button>
         <aside class="sidebar active" data-sidebar>
             <div class="sidebar-info">
                 <figure class="avatar-box">
-                    <img src="logo.png" alt="Profil" width="80" id="profilePicture">
-                    <input type="file" id="profilePictureInput" accept="image/*" style="display: none;">
-                    <button class="change-photo-btn" id="changePhotoBtn">Changer la photo</button>
+                    <img src="my-avatar.png" alt="avatar" width="80" id="userAvatar">
+                    <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
                 </figure>
                 <div class="info-content">
                     <input type="text" class="name" value="Nom Utilisateur" id="userName">
@@ -68,8 +65,8 @@
                             <p class="contact-title">Langue</p>
                             <select class="contact-link" id="languageSelect">
                                 <option value="fr">Français</option>
-                                <option value="en">English</option>
-                                <option value="ar">العربية</option>
+                                <option value="en">Anglais</option>
+                                <option value="ar">Arabe</option>
                             </select>
                         </div>
                     </li>
@@ -111,8 +108,16 @@
                 </ul>
                 <div class="separator"></div>
                 <ul class="social-list">
-                    <li class="social-item"><a href="#" class="social-link" title="Politiques"><ion-icon name="lock-closed-outline"></ion-icon></a></li>
-                    <li class="social-item"><a href="#" class="social-link" title="Infos"><ion-icon name="information-circle-outline"></ion-icon></a></li>
+                    <li class="social-item">
+                        <a href="#" class="social-link" title="Politiques de confidentialité">
+                            <ion-icon name="lock-closed-outline"></ion-icon>
+                        </a>
+                    </li>
+                    <li class="social-item">
+                        <a href="#" class="social-link" title="Informations">
+                            <ion-icon name="information-circle-outline"></ion-icon>
+                        </a>
+                    </li>
                     <li class="social-item"><a href="#" class="social-link"><ion-icon name="logo-facebook"></ion-icon></a></li>
                     <li class="social-item"><a href="#" class="social-link"><ion-icon name="logo-twitter"></ion-icon></a></li>
                     <li class="social-item"><a href="#" class="social-link"><ion-icon name="logo-instagram"></ion-icon></a></li>
@@ -120,13 +125,13 @@
             </div>
         </aside>
     </main>
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js"></script>
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <script src="firebase.js"></script>
-    <script src="main.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
