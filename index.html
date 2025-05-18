@@ -3,44 +3,338 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>La Voie du Salut - Détails</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500&family=Plus+Jakarta+Sans&family=Readex+Pro:wght@500&display=swap" rel="stylesheet">
+    <title>La Voie du Salut - Chercheur de Vérité</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;600&family=Outfit:wght@500&family=Plus+Jakarta+Sans&family=Readex+Pro:wght@500&family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <link rel="shortcut icon" href="logo.png" type="image/x-icon">
+    <meta name="manifest" content='{
+        "name": "La Voie du Salut",
+        "short_name": "Voie Salut",
+        "start_url": "/index.html",
+        "display": "standalone",
+        "background_color": "#ffffff",
+        "theme_color": "#8b0000",
+        "icons": [
+            {
+                "src": "logo.png",
+                "sizes": "192x192",
+                "type": "image/png"
+            },
+            {
+                "src": "logo.png",
+                "sizes": "512x512",
+                "type": "image/png"
+            }
+        ]
+    }'>
 </head>
 <body>
-    <div class="scaffold">
-        <div class="background-container">
-            <div class="top-bar"></div>
-            <div class="bottom-content">
-                <h1 class="title">La Voie du Salut - Chercheur de Vérité</h1>
-                <div class="details-row">
-                    <div class="author-info">
-                        <div class="author">Ahmed Said Aidara</div>
-                        <div class="rating">
-                            <div class="rating-stars">★★★★☆</div>
-                            <div class="rating-value">4.7</div>
+    <!-- Section Accueil -->
+    <section id="accueil" class="section active">
+        <div class="scaffold">
+            <div class="background-container">
+                <div class="top-bar"></div>
+                <div class="bottom-content">
+                    <h1 class="title">La Voie du Salut - Chercheur de Vérité</h1>
+                    <div class="details-row">
+                        <div class="author-info">
+                            <div class="author">Ahmed Said Aidara</div>
+                            <div class="rating">
+                                <div class="rating-stars">★★★★☆</div>
+                                <div class="rating-value">4.7</div>
+                            </div>
                         </div>
+                        <div class="start-button" id="startButton">Commencer</div>
                     </div>
-                    <div class="start-button" id="startButton">Commencer</div>
+                    <div class="section-label">Description</div>
+                    <p class="description">
+                        Imaginez un livre qui ne se contente pas de vous raconter une histoire, 
+                        mais qui vous guide pas à pas vers la compréhension profonde des mystères 
+                        de la vie. Ce livre est une boussole spirituelle, une lumière dans les 
+                        ténèbres de l'ignorance. À travers ses pages, vous découvrirez des vérités 
+                        cachées et des enseignements précieux qui transformeront votre perception 
+                        du monde et de votre existence.
+                    </p>
                 </div>
-                <div class="section-label">Description</div>
-                <p class="description">
-                    Imaginez un livre qui ne se contente pas de vous raconter une histoire, 
-                    mais qui vous guide pas à pas vers la compréhension profonde des mystères 
-                    de la vie. Ce livre est une boussole spirituelle, une lumière dans les 
-                    ténèbres de l'ignorance. À travers ses pages, vous découvrirez des vérités 
-                    cachées et des enseignements précieux qui transformeront votre perception 
-                    du monde et de votre existence.
-                </p>
             </div>
         </div>
+    </section>
+
+    <!-- Section Sommaire -->
+    <section id="sommaire" class="section">
+        <div class="glass-container">
+            <header class="hero-header">
+                <h1 class="hero-title">La Voie du Salut</h1>
+                <p class="hero-subtitle">Sommaire des chapitres</p>
+            </header>
+            <main class="chapter-container">
+                <div class="chapter-card" data-chapter="1">
+                    <h2>Chapitre 1 : L’Aube Nouvelle</h2>
+                </div>
+                <div class="chapter-card" data-chapter="2">
+                    <h2>Chapitre 2 : Les Murmures du Passé</h2>
+                </div>
+                <div class="chapter-card" data-chapter="3">
+                    <h2>Chapitre 3 : La Quête de Clara</h2>
+                </div>
+                <div class="chapter-card" data-chapter="4">
+                    <h2>Chapitre 4 : Ombres et Révélations</h2>
+                </div>
+                <div class="chapter-card" data-chapter="5">
+                    <h2>Chapitre 5 : Vers l’Éternité</h2>
+                </div>
+            </main>
+        </div>
+        <div class="background-animation">
+            <div class="anim-circle"></div>
+            <div class="anim-circle"></div>
+        </div>
+        <div class="bottom-bar">
+            <div class="icon" data-nav="accueil"><i class="material-icons">home</i></div>
+            <div class="icon active" data-nav="sommaire"><i class="material-icons">list_alt</i></div>
+            <div class="icon" data-nav="lecture"><i class="material-icons">menu_book</i></div>
+            <div class="icon" data-nav="favoris"><i class="material-icons">collections_bookmark</i></div>
+            <div class="icon" data-nav="parametres"><i class="material-icons">account_circle</i></div>
+        </div>
+    </section>
+
+    <!-- Section Lecture -->
+    <section id="lecture" class="section">
+        <div class="app-container">
+            <div class="top-bar">
+                <div class="icon" id="back-btn"><i class="material-icons">arrow_back</i></div>
+                <div class="icon" id="theme-toggle"><i class="material-icons theme-icon">brightness_4</i></div>
+                <div class="icon" id="zoom-controls"><i class="material-icons">zoom_in</i></div>
+                <div class="icon" id="audio-reader"><i class="material-icons">headphones</i></div>
+                <div class="icon" id="bookmark-btn"><i class="material-icons">favorite_border</i></div>
+                <div class="icon" id="language-switcher"><i class="material-icons">language</i></div>
+            </div>
+            <div class="book-content">
+                <section id="chapter1">
+                    <h1>Chapitre 1 : L’Aube Nouvelle</h1>
+                    <div class="chapter">Chapitre 1</div>
+                    <p>Clara se tenait au sommet de la colline, contemplant l’horizon où le soleil naissant peignait le ciel de teintes dorées. Elle savait que ce jour marquerait un tournant. Les anciens récits, murmurés par les sages, parlaient d’une vérité enfouie, d’un chemin vers la salvation.</p>
+                    <p>Ses pas la menèrent vers un village oublié, où les habitants vivaient dans l’ignorance de leur héritage spirituel. Clara, guidée par une force invisible, entreprit de réveiller leurs âmes endormies.</p>
+                </section>
+                <section id="chapter2">
+                    <h1>Chapitre 2 : Les Murmures du Passé</h1>
+                    <div class="chapter">Chapitre 2</div>
+                    <p>Dans les archives poussiéreuses du temple, Clara découvrit un manuscrit ancien. Ses pages, jaunies par le temps, révélaient des vérités sur l’origine de l’humanité, des vérités que les puissants avaient cherché à effacer.</p>
+                    <p>Chaque mot semblait vibrer d’une énergie propre, comme si le passé parlait directement à son cœur. Mais avec la connaissance venait le danger, et Clara sentit une ombre grandir autour d’elle.</p>
+                </section>
+                <section id="chapter3">
+                    <h1>Chapitre 3 : La Quête de Clara</h1>
+                    <div class="chapter">Chapitre 3</div>
+                    <p>Armée de son courage et du manuscrit, Clara entreprit un voyage à travers des terres hostiles. Les épreuves étaient nombreuses : tempêtes, trahisons, et doutes intérieurs. Pourtant, chaque obstacle renforçait sa détermination.</p>
+                    <p>Elle rencontra des alliés inattendus, des âmes perdues comme elle, cherchant la lumière dans les ténèbres. Ensemble, ils formèrent un lien indéfectible.</p>
+                </section>
+                <section id="chapter4">
+                    <h1>Chapitre 4 : Ombres et Révélations</h1>
+                    <div class="chapter">Chapitre 4</div>
+                    <p>Le voile se leva sur les ennemis de Clara : une confrérie secrète, déterminée à garder la vérité cachée. Ils voyaient en elle une menace, une étincelle capable d’embraser le monde.</p>
+                    <p>Dans un affrontement final, Clara utilisa non pas la force, mais la sagesse du manuscrit, révélant une vérité si puissante qu’elle ébranla même ses adversaires.</p>
+                </section>
+                <section id="chapter5">
+                    <h1>Chapitre 5 : Vers l’Éternité</h1>
+                    <div class="chapter">Chapitre 5</div>
+                    <p>Avec la vérité rétablie, Clara guida son peuple vers un nouvel âge. Les divisions s’effacèrent, et les cœurs s’ouvrirent à une compréhension plus profonde de l’existence.</p>
+                    <p>Clara, désormais une légende, disparut dans les montagnes, laissant derrière elle un monde transformé, prêt à embrasser l’éternité.</p>
+                </section>
+            </div>
+            <div class="bottom-bar">
+                <div class="icon" data-nav="accueil"><i class="material-icons">home</i></div>
+                <div class="icon" data-nav="sommaire"><i class="material-icons">list_alt</i></div>
+                <div class="icon active" data-nav="lecture"><i class="material-icons">menu_book</i></div>
+                <div class="icon" data-nav="favoris"><i class="material-icons">collections_bookmark</i></div>
+                <div class="icon" data-nav="parametres"><i class="material-icons">account_circle</i></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Favoris -->
+    <section id="favoris" class="section">
+        <div class="glass-container">
+            <header class="hero-header">
+                <h1 class="hero-title">Favoris</h1>
+                <p class="hero-subtitle">Vos chapitres préférés</p>
+            </header>
+            <main class="chapter-container" id="favoritesList">
+                <!-- Les favoris seront ajoutés dynamiquement via JS -->
+            </main>
+        </div>
+        <div class="background-animation">
+            <div class="anim-circle"></div>
+            <div class="anim-circle"></div>
+        </div>
+        <div class="bottom-bar">
+            <div class="icon" data-nav="accueil"><i class="material-icons">home</i></div>
+            <div class="icon" data-nav="sommaire"><i class="material-icons">list_alt</i></div>
+            <div class="icon" data-nav="lecture"><i class="material-icons">menu_book</i></div>
+            <div class="icon active" data-nav="favoris"><i class="material-icons">collections_bookmark</i></div>
+            <div class="icon" data-nav="parametres"><i class="material-icons">account_circle</i></div>
+        </div>
+    </section>
+
+    <!-- Section Paramètres -->
+    <section id="parametres" class="section">
+        <main>
+            <button class="back-btn" id="backBtn">
+                <ion-icon name="arrow-back"></ion-icon> Retour
+            </button>
+            <aside class="sidebar active" data-sidebar>
+                <div class="sidebar-info">
+                    <figure class="avatar-box">
+                        <img src="my-avatar.png" alt="avatar" width="80" id="userAvatar">
+                        <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
+                    </figure>
+                    <div class="info-content">
+                        <input type="text" class="name" value="Nom Utilisateur" id="userName">
+                        <p class="title">Membre depuis 2023</p>
+                    </div>
+                </div>
+                <div class="sidebar-info-more">
+                    <div class="separator"></div>
+                    <ul class="contacts-list">
+                        <li class="contact-item">
+                            <div class="icon-box">
+                                <ion-icon name="mail-outline"></ion-icon>
+                            </div>
+                            <div class="contact-info">
+                                <p class="contact-title">Email</p>
+                                <input type="email" class="contact-link" value="utilisateur@example.com" id="userEmail">
+                            </div>
+                        </li>
+                        <li class="contact-item">
+                            <div class="icon-box">
+                                <ion-icon name="phone-portrait-outline"></ion-icon>
+                            </div>
+                            <div class="contact-info">
+                                <p class="contact-title">Téléphone</p>
+                                <input type="tel" class="contact-link" value="+1 (123) 456-7890" id="userPhone">
+                            </div>
+                        </li>
+                        <li class="contact-item">
+                            <div class="icon-box">
+                                <ion-icon name="lock-closed-outline"></ion-icon>
+                            </div>
+                            <div class="contact-info">
+                                <p class="contact-title">Mot de passe</p>
+                                <a href="#" class="contact-link" id="resetPassword">Réinitialiser</a>
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="separator"></div>
+                    <h3 class="h3">Personnalisation</h3>
+                    <ul class="contacts-list">
+                        <li class="contact-item">
+                            <div class="icon-box">
+                                <ion-icon name="language-outline"></ion-icon>
+                            </div>
+                            <div class="contact-info">
+                                <p class="contact-title">Langue</p>
+                                <select class="contact-link" id="languageSelect">
+                                    <option value="fr">Français</option>
+                                    <option value="en">Anglais</option>
+                                    <option value="ar">Arabe</option>
+                                </select>
+                            </div>
+                        </li>
+                        <li class="contact-item">
+                            <div class="icon-box">
+                                <ion-icon name="text-outline"></ion-icon>
+                            </div>
+                            <div class="contact-info">
+                                <p class="contact-title">Taille du texte</p>
+                                <input type="range" min="10" max="24" value="16" id="textSize">
+                            </div>
+                        </li>
+                        <li class="contact-item">
+                            <div class="icon-box">
+                                <ion-icon name="contrast-outline"></ion-icon>
+                            </div>
+                            <div class="contact-info">
+                                <p class="contact-title">Thème</p>
+                                <select class="contact-link" id="themeSelect">
+                                    <option value="light">Clair</option>
+                                    <option value="dark">Sombre</option>
+                                    <option value="auto">Automatique</option>
+                                </select>
+                            </div>
+                        </li>
+                        <li class="contact-item">
+                            <div class="icon-box">
+                                <ion-icon name="volume-high-outline"></ion-icon>
+                            </div>
+                            <div class="contact-info">
+                                <p class="contact-title">Voix de lecture</p>
+                                <select class="contact-link" id="voiceSelect">
+                                    <option value="female">Féminine</option>
+                                    <option value="male">Masculine</option>
+                                    <option value="neutral">Neutre</option>
+                                </select>
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="separator"></div>
+                    <ul class="social-list">
+                        <li class="social-item">
+                            <a href="#" class="social-link" title="Politiques de confidentialité">
+                                <ion-icon name="lock-closed-outline"></ion-icon>
+                            </a>
+                        </li>
+                        <li class="social-item">
+                            <a href="#" class="social-link" title="Informations">
+                                <ion-icon name="information-circle-outline"></ion-icon>
+                            </a>
+                        </li>
+                        <li class="social-item"><a href="#" class="social-link"><ion-icon name="logo-facebook"></ion-icon></a></li>
+                        <li class="social-item"><a href="#" class="social-link"><ion-icon name="logo-twitter"></ion-icon></a></li>
+                        <li class="social-item"><a href="#" class="social-link"><ion-icon name="logo-instagram"></ion-icon></a></li>
+                    </ul>
+                </div>
+            </aside>
+        </main>
+    </section>
+
+    <!-- Bouton IA -->
+    <div class="ai-assistant-btn" id="aiAssistantBtn">
+        <ion-icon name="sparkles"></ion-icon>
     </div>
+    <div class="ai-chat-container" id="aiChatContainer">
+        <div class="ai-chat-header">
+            <div class="ai-avatar">
+                <img src="logo.png" alt="Assistant IA">
+                <div class="ai-status"></div>
+            </div>
+            <h3>Assistant Premium</h3>
+            <button class="ai-close-btn" id="aiCloseBtn">
+                <ion-icon name="close"></ion-icon>
+            </button>
+        </div>
+        <div class="ai-chat-messages" id="aiChatMessages"></div>
+        <div class="ai-chat-input-container">
+            <div class="ai-input-box">
+                <input type="text" id="aiUserInput" placeholder="Écrivez votre message...">
+                <button id="aiSendBtn">
+                    <ion-icon name="paper-plane"></ion-icon>
+                </button>
+            </div>
+            <div class="ai-typing-indicator" id="aiTypingIndicator">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+            <button id="aiClearHistoryBtn" class="ai-clear-btn">Effacer l’historique</button>
+        </div>
+    </div>
+
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
-    <script src="firebase.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
