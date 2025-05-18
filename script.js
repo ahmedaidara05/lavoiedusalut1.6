@@ -39,9 +39,8 @@ let currentSection = 'accueil';
 let previousSection = 'accueil';
 function showSection(sectionId) {
     console.log(`Affichage de la section: ${sectionId}`);
-    document.querySelectorAll('.section').forEach(section => {
-        section.classList.remove('active');
-    });
+    const sections = document.querySelectorAll('.section');
+    sections.forEach(section => section.classList.remove('active'));
     const targetSection = document.getElementById(sectionId);
     if (targetSection) {
         targetSection.classList.add('active');
@@ -56,75 +55,83 @@ function showSection(sectionId) {
     }
 }
 
-// Authentification
-auth.onAuthStateChanged(user => {
-    if (!user) {
-        alert('Veuillez vous connecter');
-        // window.location.href = 'login.html'; // À créer si besoin
-    }
-});
-
-// Préférences
-const defaultPrefs = {
-    language: 'fr',
-    theme: 'light',
-    textSize: 16,
-    voice: 'female'
-};
-let userPrefs = { ...defaultPrefs };
-function savePrefs() {
-    if (auth.currentUser) {
-        db.collection('users').doc(auth.currentUser.uid).set(userPrefs, { merge: true });
-    }
-    localStorage.setItem('prefs', JSON.stringify(userPrefs));
-}
-function loadPrefs() {
-    if (auth.currentUser) {
-        db.collection('users').doc(auth.currentUser.uid).get().then(doc => {
-            if (doc.exists) {
-                userPrefs = { ...defaultPrefs, ...doc.data() };
-                applyPrefs();
-            }
-        });
-    }
-    const savedPrefs = localStorage.getItem('prefs');
-    if (savedPrefs) {
-        userPrefs = { ...defaultPrefs, ...JSON.parse(savedPrefs) };
-        applyPrefs();
-    }
-}
-function applyPrefs() {
-    document.documentElement.style.fontSize = `${userPrefs.textSize}px`;
-    const isDark = userPrefs.theme === 'dark' || (userPrefs.theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    document.getElementById('lecture').classList.toggle('dark-mode', isDark);
-    document.querySelector('#languageSelect')?.value = userPrefs.language;
-    document.querySelector('#themeSelect')?.value = userPrefs.theme;
-    document.querySelector('#textSize')?.value = userPrefs.textSize;
-    document.querySelector('#voiceSelect')?.value = userPrefs.voice;
-}
-
 // Initialisation
 document.addEventListener('DOMContentLoaded', () => {
-    loadPrefs();
-    showSection('accueil');
+    console.log('DOM chargé');
 
     // Bouton Commencer
     const startButton = document.getElementById('startButton');
     if (startButton) {
         startButton.addEventListener('click', () => {
-            console.log('Bouton Commencer cliqué, affichage de sommaire');
+            console.log('Bouton Commencer cliqué !');
             showSection('sommaire');
         });
     } else {
-        console.error('Bouton startButton non trouvé');
+        console.error('startButton non trouvé');
     }
 
     // Navigation barre inférieure
     document.querySelectorAll('.bottom-bar .icon').forEach(icon => {
-        icon.addEventListener('click', () => {
-            showSection(icon.dataset.nav);
-        });
+        icon.addEventListener('click', () => showSection(icon.dataset.nav));
     });
+
+    // Authentification
+    auth.onAuthStateChanged(user => {
+        if (!user) {
+            console.log('Utilisateur non connecté');
+            alert('Veuillez vous connecter');
+        } else {
+            console.log(`Utilisateur connecté: ${user.email}`);
+        }
+    });
+
+    // Préférences
+    const defaultPrefs = {
+        language: 'fr',
+        theme: 'light',
+        textSize: 16,
+        voice: 'female'
+    };
+    let userPrefs = { ...defaultPrefs };
+    function savePrefs() {
+        if (auth.currentUser) {
+            db.collection('users').doc(auth.currentUser.uid).set(userPrefs, { merge: true });
+        }
+        localStorage.setItem('prefs', JSON.stringify(userPrefs));
+    }
+    function loadPrefs() {
+        if (auth.currentUser) {
+            db.collection('users').doc(auth.currentUser.uid).get().then(doc => {
+                if (doc.exists) {
+                    userPrefs = { ...defaultPrefs, ...doc.data() };
+                    applyPrefs();
+                }
+            });
+        }
+        const savedPrefs = localStorage.getItem('prefs');
+        if (savedPrefs) {
+            userPrefs = { ...defaultPrefs, ...JSON.parse(savedPrefs) };
+            applyPrefs();
+        }
+    }
+    function applyPrefs() {
+        document.documentElement.style.fontSize = `${userPrefs.textSize}px`;
+        const isDark = userPrefs.theme === 'dark' || (userPrefs.theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        document.getElementById('lecture')?.classList.toggle('dark-mode', isDark);
+        
+        const languageSelect = document.querySelector('#languageSelect');
+        if (languageSelect) languageSelect.value = userPrefs.language;
+        
+        const themeSelect = document.querySelector('#themeSelect');
+        if (themeSelect) themeSelect.value = userPrefs.theme;
+        
+        const textSize = document.querySelector('#textSize');
+        if (textSize) textSize.value = userPrefs.textSize;
+        
+        const voiceSelect = document.querySelector('#voiceSelect');
+        if (voiceSelect) voiceSelect.value = userPrefs.voice;
+    }
+    loadPrefs();
 
     // Sommaire
     document.querySelectorAll('#sommaire .chapter-card').forEach((card, index) => {
@@ -136,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
             card.style.transform = 'translateY(0)';
         }, 100);
         card.addEventListener('click', () => {
-            const chapter = card.dataset.chapter;
+            const chapter26 = card.dataset.chapter;
             showSection('lecture');
             document.getElementById(`chapter${chapter}`).scrollIntoView();
         });
@@ -219,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 db.collection('users').doc(auth.currentUser.uid).collection('favorites').doc(chapterId).set({
                     id: chapterId,
                     title: document.querySelector(`#chapter${chapterId} h1`).textContent,
-                    progress: 100 // Simulé
+                    progress: 100
                 });
                 icon.textContent = 'favorite';
                 icon.style.color = '#e74c3c';
@@ -421,7 +428,7 @@ document.addEventListener('DOMContentLoaded', () => {
             halo.style.width = '100%';
             halo.style.height = '100%';
             halo.style.background = 'radial-gradient(circle, rgba(255,215,0,0.4) 0%, rgba(255,215,0,0) 70%)';
-            halo.style.borderRadius = '50%';
+            halo.style.border-radius = '50%';
             halo.style.top = '0';
             halo.style.left = '0';
             halo.style.opacity = '0';
