@@ -82,6 +82,13 @@ input, textarea, select {
     color: inherit;
     border: none;
 }
+.section {
+    display: none;
+    min-height: 100vh;
+}
+.section.active {
+    display: block;
+}
 
 /* Accueil */
 .scaffold {
@@ -192,11 +199,10 @@ input, textarea, select {
 }
 
 /* Sommaire/Favoris */
-body.sommaire, body.favoris {
+#sommaire, #favoris {
     font-family: 'Montserrat', sans-serif;
     background: linear-gradient(135deg, #1a1a1a 0%, #2d3436 100%);
     color: var(--text);
-    min-height: 100vh;
 }
 .glass-container {
     background: var(--glass);
@@ -244,7 +250,7 @@ body.sommaire, body.favoris {
 }
 .chapter-card h2 {
     font-size: 1.3rem;
-   -    font-weight: 500;
+    font-weight: 500;
     color: var(--text);
     margin: 0;
 }
@@ -305,11 +311,11 @@ body.sommaire, body.favoris {
 }
 
 /* Lecture */
-body.light-mode {
+#lecture.light-mode {
     background-color: #f5f5f5;
     color: #333;
 }
-body.dark-mode {
+#lecture.dark-mode {
     background-color: #121212;
     color: #e0e0e0;
 }
@@ -322,7 +328,7 @@ body.dark-mode {
     background-color: white;
     box-shadow: 0 0 10px rgba(0,0,0,0.05);
 }
-body.dark-mode .app-container {
+#lecture.dark-mode .app-container {
     background-color: #1e1e1e;
 }
 .top-bar, .bottom-bar {
@@ -333,8 +339,8 @@ body.dark-mode .app-container {
     background-color: #f0f0f0;
     border-bottom: 1px solid #e0e0e0;
 }
-body.dark-mode .top-bar,
-body.dark-mode .bottom-bar {
+#lecture.dark-mode .top-bar,
+#lecture.dark-mode .bottom-bar {
     background-color: #2d2d2d;
     border-color: #444;
 }
@@ -349,14 +355,14 @@ body.dark-mode .bottom-bar {
     transition: all 0.3s;
     color: #555;
 }
-body.dark-mode .icon {
+#lecture.dark-mode .icon {
     color: #aaa;
 }
 .icon:hover {
     background-color: #e0e0e0;
     transform: scale(1.1);
 }
-body.dark-mode .icon:hover {
+#lecture.dark-mode .icon:hover {
     background-color: #444;
 }
 .icon.active {
@@ -369,7 +375,7 @@ body.dark-mode .icon:hover {
     text-align: justify;
     line-height: 1.8;
 }
-body.dark-mode .book-content {
+#lecture.dark-mode .book-content {
     background-color: #1e1e1e;
     color: #e0e0e0;
 }
@@ -379,7 +385,7 @@ body.dark-mode .book-content {
     margin-bottom: 15px;
     color: #8b0000;
 }
-body.dark-mode .book-content h1 {
+#lecture.dark-mode .book-content h1 {
     color: #c0392b;
 }
 .chapter {
@@ -398,7 +404,7 @@ body.dark-mode .book-content h1 {
     color: #1a5276;
     font-weight: bold;
 }
-body.dark-mode .verse {
+#lecture.dark-mode .verse {
     color: #5d9cec;
 }
 .theme-icon {
@@ -416,7 +422,7 @@ body.dark-mode .verse {
 }
 
 /* Paramètres */
-body.parametres {
+#parametres {
     font-family: var(--ff-poppins);
     background: var(--smoky-black);
 }
