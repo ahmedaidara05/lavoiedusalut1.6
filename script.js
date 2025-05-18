@@ -65,16 +65,23 @@ function applyPrefs() {
 }
 
 // Accueil
-if (document.getElementById('startButton')) {
-    document.getElementById('startButton').addEventListener('click', () => {
-        window.location.href = 'sommaire.html';
-    });
+document.addEventListener('DOMContentLoaded', () => {
+    const startButton = document.getElementById('startButton');
+    if (startButton) {
+        startButton.addEventListener('click', () => {
+            console.log('Bouton Commencer cliqué, redirection vers sommaire.html');
+            window.location.href = 'sommaire.html';
+        });
+    } else {
+        console.error('Bouton startButton non trouvé');
+    }
     const animatedElements = document.querySelectorAll('.title, .details-row, .section-label, .description');
     animatedElements.forEach(el => {
         const startY = getComputedStyle(el).transform === 'matrix(1, 0, 0, 1, 0, 0)' ?
             el.style.transform.replace('translateY(', '').replace('px)', '') : 0;
         el.style.setProperty('--start-y', startY + 'px');
     });
+});
 }
 
 // Sommaire/Favoris
