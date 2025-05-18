@@ -90,6 +90,27 @@ input, textarea, select {
     display: block;
 }
 
+/* Styles pour icônes */
+.material-icons {
+    font-family: 'Material Icons', sans-serif;
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+    color: #555;
+}
+ion-icon {
+    font-size: 24px;
+    vertical-align: middle;
+    color: #555;
+}
+
 /* Accueil */
 .scaffold {
     height: 100vh;
@@ -169,6 +190,7 @@ input, textarea, select {
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    user-select: none;
     transition: all 0.3s ease;
 }
 .start-button:hover {
@@ -353,9 +375,15 @@ input, textarea, select {
     padding: 8px;
     border-radius: 50%;
     transition: all 0.3s;
-    color: #555;
 }
 #lecture.dark-mode .icon {
+    color: #aaa;
+}
+.bottom-bar .icon i {
+    color: #555;
+    font-size: 24px;
+}
+#lecture.dark-mode .bottom-bar .icon i {
     color: #aaa;
 }
 .icon:hover {
