@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favoris - La Voie du Salut</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="shortcut icon" href="book-icon.png" type="image/png">
+</head>
+<body class="light-mode">
+    <div class="glass-container">
+        <header class="hero-header">
+            <h1 class="hero-title">Favoris</h1>
+            <p class="hero-subtitle">Vos chapitres préférés</p>
+        </header>
+        <main class="chapter-container" id="favoritesList">
+            <!-- Liste dynamique des favoris -->
+        </main>
+    </div>
+    <div class="bottom-bar">
+        <span class="icon material-icons" data-page="index.html">home</span>
+        <span class="icon material-icons" data-page="sommaire.html">list</span>
+        <span class="icon material-icons" data-page="lecture.html">book</span>
+        <span class="icon material-icons active" data-page="favoris.html">star</span>
+        <span class="icon material-icons" data-page="parametres.html">person</span>
+    </div>
+    <div class="ai-assistant-btn" id="aiAssistantBtn">
+        <ion-icon name="sparkles"></ion-icon>
+    </div>
+    <div class="ai-chat-container" id="aiChatContainer">
+        <div class="ai-chat-header">
+            <div class="ai-avatar">
+                <img src="logo.png" alt="Assistant IA">
+                <div class="ai-status"></div>
+            </div>
+            <h3>Assistant Premium</h3>
+            <button class="ai-close-btn" id="aiCloseBtn">
+                <ion-icon name="close"></ion-icon>
+            </button>
+        </div>
+        <div class="ai-chat-messages" id="aiChatMessages"></div>
+        <div class="ai-chat-input-container">
+            <div class="ai-input-box">
+                <input type="text" id="aiUserInput" placeholder="Écrivez votre message...">
+                <button id="aiSendBtn">
+                    <ion-icon name="paper-plane"></ion-icon>
+                </button>
+            </div>
+            <div class="ai-typing-indicator" id="aiTypingIndicator">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+        </div>
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script src="firebase.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
