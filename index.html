@@ -11,19 +11,15 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="icon512.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <!-- Firebase SDK (version globale compat) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
-    <header>
-        <nav class="left-nav">
-            <button id="home-btn" title="Accueil">🏠</button>
-            <button id="menu-btn" title="Sommaire">☰</button>
-        </nav>
+    <header class="top-navbar">
         <div class="header-content">
-            <h1>Lecteur de Livre</h1>
+            <h1>La Voie du Salut</h1>
             <img src="book-cover.jpg" alt="Couverture du livre" class="header-book">
         </div>
         <nav class="right-nav">
@@ -37,16 +33,10 @@
             <button id="language-toggle" title="Changer de langue">
                 <span class="icon">🌐</span>
             </button>
-            <button id="favorites-btn" title="Voir les favoris">⭐</button>
-            <button id="profile-btn" title="Profil">
-                <span class="icon">👤</span>
-                <span id="user-status" class="user-status"></span>
-            </button>
         </nav>
     </header>
 
     <main>
-        <!-- Page d'accueil -->
         <section id="home" class="active">
             <div class="home-content">
                 <div class="home-text">
@@ -58,24 +48,22 @@
             </div>
         </section>
 
-        <!-- Sommaire -->
         <section id="table-of-contents" class="chapter">
             <button class="close-btn" title="Retour à l'accueil">✖</button>
             <h2>Sommaire</h2>
             <ul id="chapter-list">
-                <li><a href="#chapter1">Chapitre 1 : L'Aube Nouvelle</a></li>
-                <li><a href="#chapter2">Chapitre 2 : Les Ombres du Passé</a></li>
-                <li><a href="#chapter3">Chapitre 3 : Le Voyage Commence</a></li>
-                <li><a href="#chapter4">Chapitre 4 : Secrets Révélés</a></li>
-                <li><a href="#chapter5">Chapitre 5 : L'Horizon Lointain</a></li>
+                <li><a href="#chapter1">Chapitre 1 : LA GENÈSE</a></li>
+                <li><a href="#chapter2">Chapitre 2 : Qui m’a créé et qui suis-je ?</a></li>
+                <li><a href="#chapter3">Chapitre 3 : Pourquoi on m’a créé ?</a></li>
+                <li><a href="#chapter4">Chapitre 4 : Qu’est-ce qui m’attend ?</a></li>
+                <li><a href="#chapter5">Chapitre 5 : Où irai-je ?</a></li>
             </ul>
         </section>
 
-        <!-- Chapitre 1 -->
         <section id="chapter1" class="chapter">
             <button class="close-btn" title="Retour à l'accueil">✖</button>
             <div class="chapter-header">
-                <h2>Chapitre 1 : L'Aube Nouvelle</h2>
+                <h2>Chapitre 1 : LA GENÈSE</h2>
                 <span class="favorite" data-chapter="chapter1" title="Ajouter aux favoris">⭐</span>
             </div>
             <div class="content" data-lang="fr">
@@ -93,7 +81,6 @@
             </div>
         </section>
 
-        <!-- Chapitre 2 -->
         <section id="chapter2" class="chapter">
             <button class="close-btn" title="Retour à l'accueil">✖</button>
             <div class="chapter-header">
@@ -115,7 +102,6 @@
             </div>
         </section>
 
-        <!-- Chapitre 3 -->
         <section id="chapter3" class="chapter">
             <button class="close-btn" title="Retour à l'accueil">✖</button>
             <div class="chapter-header">
@@ -137,7 +123,6 @@
             </div>
         </section>
 
-        <!-- Chapitre 4 -->
         <section id="chapter4" class="chapter">
             <button class="close-btn" title="Retour à l'accueil">✖</button>
             <div class="chapter-header">
@@ -159,7 +144,6 @@
             </div>
         </section>
 
-        <!-- Chapitre 5 -->
         <section id="chapter5" class="chapter">
             <button class="close-btn" title="Retour à l'accueil">✖</button>
             <div class="chapter-header">
@@ -181,14 +165,12 @@
             </div>
         </section>
 
-        <!-- Page des favoris -->
         <section id="favorites" class="chapter">
             <button class="close-btn" title="Retour à l'accueil">✖</button>
             <h2>Vos Chapitres Favoris</h2>
             <ul id="favorites-list"></ul>
         </section>
 
-        <!-- Page de profil -->
         <section id="profile" class="chapter">
             <button class="close-btn" title="Retour à l'accueil">✖</button>
             <h2>Profil</h2>
@@ -200,7 +182,6 @@
                     <button id="sign-out-btn">Déconnexion</button>
                 </div>
                 <div id="auth-forms">
-                    <!-- Formulaire de connexion -->
                     <h4>Connexion</h4>
                     <form id="login-form">
                         <div class="form-group">
@@ -214,7 +195,6 @@
                         <button type="submit">Se connecter</button>
                         <p><a href="#" id="reset-password">Mot de passe oublié ?</a></p>
                     </form>
-                    <!-- Formulaire d'inscription -->
                     <h4>Inscription</h4>
                     <form id="signup-form">
                         <div class="form-group">
@@ -259,19 +239,27 @@
             </div>
         </section>
     </main>
-  <!-- Assistant IA -->
-<div id="ai-assistant-icon" title="Assistant IA"></div>
 
-<div id="ai-chat-box">
-  <header>Assistant IA 📖</header>
-  <div id="chat-messages"></div>
-  <footer>
-    <input type="text" id="ai-input" placeholder="Pose une question sur le livre..." />
-    <button id="ai-send-btn">Envoyer</button>
-  </footer>
-</div>
+    <div id="ai-assistant-icon" title="Assistant IA"></div>
+    <div id="ai-chat-box">
+        <header>Assistant IA 📖</header>
+        <div id="chat-messages"></div>
+        <footer>
+            <input type="text" id="ai-input" placeholder="Pose une question sur le livre..." />
+            <button id="ai-send-btn">Envoyer</button>
+        </footer>
+    </div>
+
+    <nav class="bottom-navbar">
+        <button id="home-btn" title="Accueil">🏠</button>
+        <button id="menu-btn" title="Sommaire">☰</button>
+        <button id="favorites-btn" title="Voir les favoris">⭐</button>
+        <button id="profile-btn" title="Paramètres">
+             <span class="icon">⚙️</span>
+             <span id="user-status" class="user-status"></span> </button>
+    </nav>
+
     <script src="firebase.js"></script>
     <script src="script.js"></script>
-  
 </body>
 </html>
