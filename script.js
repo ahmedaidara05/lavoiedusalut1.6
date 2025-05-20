@@ -1,440 +1,533 @@
-// Firebase Config
-const firebaseConfig = {
-    apiKey: "AIzaSyAljojXHODwHjStePWkhthWLRzrw3pUslQ",
-    authDomain: "la-voie-du-salut-36409.firebaseapp.com",
-    projectId: "la-voie-du-salut-36409",
-    storageBucket: "la-voie-du-salut-36409.firebasestorage.app",
-    messagingSenderId: "61439310820",
-    appId: "1:61439310820:web:52bfe8b862666ac13d25f1",
-    measurementId: "G-G9S1ST8K3R"
-};
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
-const storage = firebase.storage();
-
-// Gemini
-const GEMINI_API_KEY = 'AIzaSyA0vL0QgFDkAi-ScZDVKC1G5MgcFCURE1A';
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent';
-const bookContent = {
-    fr: {
-        1: "Clara se tenait au sommet de la colline... (Chapitre 1)",
-        2: "Dans les archives poussiéreuses... (Chapitre 2)",
-        3: "Armée de son courage... (Chapitre 3)",
-        4: "Le voile se leva... (Chapitre 4)",
-        5: "Avec la vérité rétablie... (Chapitre 5)"
-    },
-    en: { /* Traductions anglaises */ },
-    ar: { /* Traductions arabes */ }
-};
-
-// Protection
-document.addEventListener('contextmenu', e => e.preventDefault());
-document.addEventListener('keydown', e => {
-    if (e.ctrlKey && (e.key === 'p' || e.key === 'c')) e.preventDefault();
-});
-
-// Navigation
-let currentSection = 'accueil';
-let previousSection = 'accueil';
-function showSection(sectionId) {
-    console.log(`Affichage de la section: ${sectionId}`);
-    const sections = document.querySelectorAll('.section');
-    sections.forEach(section => section.classList.remove('active'));
-    const targetSection = document.getElementById(sectionId);
-    if (targetSection) {
-        targetSection.classList.add('active');
-        previousSection = currentSection;
-        currentSection = sectionId;
-        document.querySelectorAll('.bottom-bar .icon').forEach(icon => {
-            icon.classList.toggle('active', icon.dataset.nav === sectionId);
-        });
-        document.querySelector('.ai-assistant-btn').style.display = ['sommaire', 'lecture', 'favoris'].includes(sectionId) ? 'flex' : 'none';
-    } else {
-        console.error(`Section ${sectionId} non trouvée`);
-    }
-}
-
-// Initialisation
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM chargé');
+    // Vérifier que firebase est chargé
+    if (!window.firebase) {
+        console.error('Firebase SDK non chargé. Vérifiez les scripts dans index.html.');
+        return;
+    }
 
-    // Bouton Commencer
-    const startButton = document.getElementById('startButton');
+    // Protection contre le copier-coller
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
+    document.addEventListener('copy', (e) => e.preventDefault());
+    document.addEventListener('cut', (e) => e.preventDefault());
+    document.addEventListener('dragstart', (e) => e.preventDefault());
+    document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && (e.key === 'p' || e.key === 's')) {
+            e.preventDefault();
+        }
+    });
+
+    // Gestion de l'état de l'utilisateur
+    const userInfo = document.getElementById('user-info');
+    const authForms = document.getElementById('auth-forms');
+    const userName = document.getElementById('user-name');
+    const userEmail = document.getElementById('user-email');
+    const userStatus = document.getElementById('user-status');
+    const authError = document.getElementById('auth-error');
+
+    firebase.auth().onAuthStateChanged(async (user) => {
+        if (user) {
+            userInfo.style.display = 'block';
+            authForms.style.display = 'none';
+            userName.textContent = user.displayName || 'Utilisateur';
+            userEmail.textContent = user.email;
+            userStatus.textContent = '🔵';
+            // Charger les préférences depuis Firestore
+            try {
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                if (userDoc.exists) {
+                    const data = userDoc.data();
+                    currentLanguage = data.language || 'fr';
+                    fontSize = data.fontSize || 16;
+                    volume = data.volume || 100;
+                    favorites = data.favorites || [];
+                    progress = data.progress || {};
+                    document.body.classList.toggle('dark', data.theme === 'dark');
+                    updateLanguage();
+                    updateFontSize();
+                    updateFavoritesList();
+                    if (profileLanguage) profileLanguage.value = currentLanguage;
+                    if (profileFontSize) profileFontSize.value = fontSize;
+                    if (fontSizeValue) fontSizeValue.textContent = `${fontSize}px`;
+                    if (profileVolume) profileVolume.value = volume;
+                    if (volumeValue) volumeValue.textContent = `${volume}%`;
+                    if (themeToggle) themeToggle.querySelector('.icon').textContent = data.theme === 'dark' ? '☀️' : '🌙';
+                    if (profileTheme) profileTheme.checked = data.theme === 'dark';
+                }
+            } catch (error) {
+                console.error('Erreur Firestore:', error);
+            }
+        } else {
+            userInfo.style.display = 'none';
+            authForms.style.display = 'block';
+            userStatus.textContent = '';
+            currentLanguage = localStorage.getItem('language') || 'fr';
+            fontSize = parseInt(localStorage.getItem('fontSize')) || 16;
+            volume = parseInt(localStorage.getItem('volume')) || 100;
+            favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+            progress = JSON.parse(localStorage.getItem('progress')) || {};
+            updateLanguage();
+            updateFontSize();
+            updateFavoritesList();
+        }
+    });
+
+    // Gestion de l'inscription
+    const signupForm = document.getElementById('signup-form');
+    if (signupForm) {
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            console.log('Inscription:', email);
+            try {
+                const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+                await userCredential.user.updateProfile({ displayName: name });
+                await db.collection('users').doc(userCredential.user.uid).set({
+                    language: currentLanguage,
+                    theme: document.body.classList.contains('dark') ? 'dark' : 'light',
+                    fontSize,
+                    volume,
+                    favorites,
+                    progress
+                });
+                authError.textContent = '';
+                signupForm.reset();
+            } catch (error) {
+                authError.textContent = error.message;
+            }
+        });
+    }
+
+    // Gestion de la connexion
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            console.log('Connexion:', email);
+            try {
+                await firebase.auth().signInWithEmailAndPassword(email, password);
+                authError.textContent = '';
+                loginForm.reset();
+            } catch (error) {
+                authError.textContent = error.message;
+            }
+        });
+    }
+
+    // Gestion de la déconnexion
+    const signOutBtn = document.getElementById('sign-out-btn');
+    if (signOutBtn) {
+        signOutBtn.addEventListener('click', async () => {
+            console.log('Déconnexion');
+            try {
+                await firebase.auth().signOut();
+                authError.textContent = '';
+            } catch (error) {
+                authError.textContent = error.message;
+            }
+        });
+    }
+
+    // Réinitialisation du mot de passe
+    const resetPasswordLink = document.getElementById('reset-password');
+    if (resetPasswordLink) {
+        resetPasswordLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            console.log('Réinitialisation mot de passe:', email);
+            if (!email) {
+                authError.textContent = 'Veuillez entrer votre e-mail.';
+                return;
+            }
+            try {
+                await firebase.auth().sendPasswordResetEmail(email);
+                authError.textContent = 'E-mail de réinitialisation envoyé !';
+            } catch (error) {
+                authError.textContent = error.message;
+            }
+        });
+    }
+
+    // Gestion du mode sombre/clair
+    const themeToggle = document.getElementById('theme-toggle');
+    const profileTheme = document.getElementById('profile-theme');
+    if (themeToggle && profileTheme) {
+        themeToggle.addEventListener('click', () => {
+            console.log('Clic mode sombre');
+            toggleTheme();
+        });
+        profileTheme.addEventListener('change', () => {
+            console.log('Changement thème profil');
+            toggleTheme();
+        });
+    }
+
+    async function toggleTheme() {
+        document.body.classList.toggle('dark');
+        const isDark = document.body.classList.contains('dark');
+        if (themeToggle) themeToggle.querySelector('.icon').textContent = isDark ? '☀️' : '🌙';
+        if (profileTheme) profileTheme.checked = isDark;
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        if (firebase.auth().currentUser) {
+            try {
+                await db.collection('users').doc(firebase.auth().currentUser.uid).update({ theme: isDark ? 'dark' : 'light' });
+            } catch (error) {
+                console.error('Erreur mise à jour thème:', error);
+            }
+        }
+    }
+
+    if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark');
+        if (themeToggle) themeToggle.querySelector('.icon').textContent = '☀️';
+        if (profileTheme) profileTheme.checked = true;
+    }
+
+    // Gestion de la taille de la police
+    let fontSize = parseInt(localStorage.getItem('fontSize')) || 16;
+    const profileFontSize = document.getElementById('profile-font-size');
+    const fontSizeValue = document.getElementById('font-size-value');
+    if (profileFontSize && fontSizeValue) {
+        profileFontSize.value = fontSize;
+        fontSizeValue.textContent = `${fontSize}px`;
+        profileFontSize.addEventListener('input', async () => {
+            console.log('Changement taille police');
+            fontSize = parseInt(profileFontSize.value);
+            fontSizeValue.textContent = `${fontSize}px`;
+            updateFontSize();
+            localStorage.setItem('fontSize', fontSize);
+            if (firebase.auth().currentUser) {
+                try {
+                    await db.collection('users').doc(firebase.auth().currentUser.uid).update({ fontSize });
+                } catch (error) {
+                    console.error('Erreur mise à jour police:', error);
+                }
+            }
+        });
+    }
+
+    function updateFontSize() {
+        document.querySelectorAll('section, section *').forEach(element => {
+            element.style.fontSize = `${fontSize}px`;
+        });
+        document.querySelectorAll('.prev-btn, .next-btn, .close-btn, .favorite').forEach(element => {
+            element.style.fontSize = `${fontSize * 0.9}px`;
+        });
+    }
+
+    updateFontSize();
+
+    // Gestion du volume de la lecture vocale
+    let volume = parseInt(localStorage.getItem('volume')) || 100;
+    const profileVolume = document.getElementById('profile-volume');
+    const volumeValue = document.getElementById('volume-value');
+    if (profileVolume && volumeValue) {
+        profileVolume.value = volume;
+        volumeValue.textContent = `${volume}%`;
+        profileVolume.addEventListener('input', async () => {
+            console.log('Changement volume');
+            volume = parseInt(profileVolume.value);
+            volumeValue.textContent = `${volume}%`;
+            localStorage.setItem('volume', volume);
+            if (currentSpeech) {
+                currentSpeech.volume = volume / 100;
+            }
+            if (firebase.auth().currentUser) {
+                try {
+                    await db.collection('users').doc(firebase.auth().currentUser.uid).update({ volume });
+                } catch (error) {
+                    console.error('Erreur mise à jour volume:', error);
+                }
+            }
+        });
+    }
+
+    // Gestion de la langue
+    let currentLanguage = localStorage.getItem('language') || 'fr';
+    const languageToggle = document.getElementById('language-toggle');
+    const profileLanguage = document.getElementById('profile-language');
+    if (languageToggle && profileLanguage) {
+        profileLanguage.value = currentLanguage;
+        languageToggle.addEventListener('click', async () => {
+            console.log('Clic langue');
+            currentLanguage = currentLanguage === 'fr' ? 'en' : currentLanguage === 'en' ? 'ar' : 'fr';
+            await updateLanguage();
+        });
+        profileLanguage.addEventListener('change', async () => {
+            console.log('Changement langue profil');
+            currentLanguage = profileLanguage.value;
+            await updateLanguage();
+        });
+    }
+
+    async function updateLanguage() {
+        document.querySelectorAll('.content').forEach(content => {
+            content.style.display = content.dataset.lang === currentLanguage ? 'block' : 'none';
+        });
+        localStorage.setItem('language', currentLanguage);
+        if (profileLanguage) profileLanguage.value = currentLanguage;
+        if (firebase.auth().currentUser) {
+            try {
+                await db.collection('users').doc(firebase.auth().currentUser.uid).update({ language: currentLanguage });
+            } catch (error) {
+                console.error('Erreur mise à jour langue:', error);
+            }
+        }
+    }
+
+    updateLanguage();
+
+    // Navigation entre sections
+    const sections = document.querySelectorAll('section');
+    const homeButton = document.getElementById('home-btn');
+    const menuButton = document.getElementById('menu-btn');
+    const startButton = document.getElementById('start-btn');
+    const profileButton = document.getElementById('profile-btn');
+    const closeButtons = document.querySelectorAll('.close-btn');
+
+    if (homeButton) {
+        homeButton.addEventListener('click', () => {
+            console.log('Clic accueil');
+            goToHome();
+        });
+    }
+    if (menuButton) {
+        menuButton.addEventListener('click', () => {
+            console.log('Clic sommaire');
+            sections.forEach(section => section.classList.remove('active'));
+            document.getElementById('table-of-contents').classList.add('active');
+        });
+    }
     if (startButton) {
         startButton.addEventListener('click', () => {
-            console.log('Bouton Commencer cliqué !');
-            showSection('sommaire');
+            console.log('Clic commencer');
+            sections.forEach(section => section.classList.remove('active'));
+            document.getElementById('table-of-contents').classList.add('active');
         });
-    } else {
-        console.error('startButton non trouvé');
     }
-
-    // Navigation barre inférieure
-    document.querySelectorAll('.bottom-bar .icon').forEach(icon => {
-        icon.addEventListener('click', () => showSection(icon.dataset.nav));
+    if (profileButton) {
+        profileButton.addEventListener('click', () => {
+            console.log('Clic profil');
+            sections.forEach(section => section.classList.remove('active'));
+            document.getElementById('profile').classList.add('active');
+        });
+    }
+    closeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            console.log('Clic fermer');
+            goToHome();
+        });
     });
 
-    // Authentification
-    auth.onAuthStateChanged(user => {
-        if (!user) {
-            console.log('Utilisateur non connecté');
-            alert('Veuillez vous connecter');
-        } else {
-            console.log(`Utilisateur connecté: ${user.email}`);
-        }
+    function goToHome() {
+        sections.forEach(section => section.classList.remove('active'));
+        document.getElementById('home').classList.add('active');
+    }
+
+    const links = document.querySelectorAll('#chapter-list a, #favorites-list a');
+    links.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('Clic lien chapitre');
+            const targetId = link.getAttribute('href').substring(1);
+            sections.forEach(section => section.classList.remove('active'));
+            document.getElementById(targetId).classList.add('active');
+        });
     });
 
-    // Préférences
-    const defaultPrefs = {
-        language: 'fr',
-        theme: 'light',
-        textSize: 16,
-        voice: 'female'
-    };
-    let userPrefs = { ...defaultPrefs };
-    function savePrefs() {
-        if (auth.currentUser) {
-            db.collection('users').doc(auth.currentUser.uid).set(userPrefs, { merge: true });
+    // Navigation entre chapitres
+    const chapters = ['chapter1', 'chapter2', 'chapter3', 'chapter4', 'chapter5'];
+    const prevButtons = document.querySelectorAll('.prev-btn');
+    const nextButtons = document.querySelectorAll('.next-btn');
+
+    prevButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            console.log('Clic précédent');
+            const currentChapter = button.closest('section').id;
+            const currentIndex = chapters.indexOf(currentChapter);
+            if (currentIndex > 0) {
+                sections.forEach(section => section.classList.remove('active'));
+                document.getElementById(chapters[currentIndex - 1]).classList.add('active');
+            }
+        });
+    });
+
+    nextButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            console.log('Clic suivant');
+            const currentChapter = button.closest('section').id;
+            const currentIndex = chapters.indexOf(currentChapter);
+            if (currentIndex < chapters.length - 1) {
+                sections.forEach(section => section.classList.remove('active'));
+                document.getElementById(chapters[currentIndex + 1]).classList.add('active');
+            }
+        });
+    });
+
+    // Gestion des favoris et progression
+    let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+    let progress = JSON.parse(localStorage.getItem('progress')) || {};
+    const favoriteStars = document.querySelectorAll('.favorite');
+
+    async function updateFavoritesList() {
+        const favoritesList = document.getElementById('favorites-list');
+        if (favoritesList) {
+            favoritesList.innerHTML = '';
+            favorites.forEach(chapterId => {
+                const chapterTitle = document.getElementById(chapterId).querySelector('h2').textContent;
+                const progressPercent = progress[chapterId] || 0;
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <a href="#${chapterId}">${chapterTitle}</a>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: ${progressPercent}%"></div>
+                    </div>
+                `;
+                favoritesList.appendChild(li);
+            });
+            document.querySelectorAll('#favorites-list a').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    console.log('Clic favori');
+                    const targetId = link.getAttribute('href').substring(1);
+                    sections.forEach(section => section.classList.remove('active'));
+                    document.getElementById(targetId).classList.add('active');
+                });
+            });
+            if (firebase.auth().currentUser) {
+                try {
+                    await db.collection('users').doc(firebase.auth().currentUser.uid).update({ favorites });
+                } catch (error) {
+                    console.error('Erreur mise à jour favoris:', error);
+                }
+            }
         }
-        localStorage.setItem('prefs', JSON.stringify(userPrefs));
     }
-    function loadPrefs() {
-        if (auth.currentUser) {
-            db.collection('users').doc(auth.currentUser.uid).get().then(doc => {
-                if (doc.exists) {
-                    userPrefs = { ...defaultPrefs, ...doc.data() };
-                    applyPrefs();
+
+    favoriteStars.forEach(star => {
+        const chapterId = star.dataset.chapter;
+        if (favorites.includes(chapterId)) {
+            star.classList.add('active');
+            star.textContent = '★';
+        }
+        star.addEventListener('click', async () => {
+            console.log('Clic favori étoile');
+            if (!favorites.includes(chapterId)) {
+                favorites.push(chapterId);
+                star.classList.add('active');
+                star.textContent = '★';
+            } else {
+                favorites = favorites.filter(id => id !== chapterId);
+                star.classList.remove('active');
+                star.textContent = '⭐';
+            }
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+            await updateFavoritesList();
+        });
+    });
+
+    const favoritesButton = document.getElementById('favorites-btn');
+    if (favoritesButton) {
+        favoritesButton.addEventListener('click', () => {
+            console.log('Clic favoris');
+            sections.forEach(section => section.classList.remove('active'));
+            document.getElementById('favorites').classList.add('active');
+        });
+    }
+
+    async function trackProgress() {
+        const activeSection = document.querySelector('section.active');
+        if (!activeSection || !activeSection.classList.contains('chapter') || activeSection.id === 'favorites' || activeSection.id === 'table-of-contents' || activeSection.id === 'profile') return;
+
+        const chapterId = activeSection.id;
+        const content = activeSection.querySelector('.content');
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const contentHeight = content.scrollHeight - window.innerHeight;
+        const progressPercent = contentHeight > 0 ? Math.min(100, (scrollTop / contentHeight) * 100) : 100;
+
+        progress[chapterId] = Math.max(progress[chapterId] || 0, progressPercent);
+        localStorage.setItem('progress', JSON.stringify(progress));
+        await updateFavoritesList();
+        if (firebase.auth().currentUser) {
+            try {
+                await db.collection('users').doc(firebase.auth().currentUser.uid).update({ progress });
+            } catch (error) {
+                console.error('Erreur mise à jour progression:', error);
+            }
+        }
+    }
+
+    window.addEventListener('scroll', trackProgress);
+    updateFavoritesList();
+
+    // Gestion de la lecture vocale
+    const voiceToggle = document.getElementById('voice-toggle');
+    const voiceSelect = document.getElementById('voice-select');
+    let currentSpeech = null;
+    let currentChapter = null;
+    let voices = [];
+
+    function populateVoiceList() {
+        voices = speechSynthesis.getVoices();
+        if (voiceSelect) {
+            voiceSelect.innerHTML = '<option value="">Voix par défaut</option>';
+            let voiceCounter = 1;
+            voices.forEach((voice, index) => {
+                if (voice.lang.startsWith('fr') || voice.lang.startsWith('en') || voice.lang.startsWith('ar')) {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = `Voix ${voiceCounter} (${voice.lang})`;
+                    voiceSelect.appendChild(option);
+                    voiceCounter++;
                 }
             });
         }
-        const savedPrefs = localStorage.getItem('prefs');
-        if (savedPrefs) {
-            userPrefs = { ...defaultPrefs, ...JSON.parse(savedPrefs) };
-            applyPrefs();
-        }
     }
-    function applyPrefs() {
-        document.documentElement.style.fontSize = `${userPrefs.textSize}px`;
-        const isDark = userPrefs.theme === 'dark' || (userPrefs.theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-        document.getElementById('lecture')?.classList.toggle('dark-mode', isDark);
-        
-        const languageSelect = document.querySelector('#languageSelect');
-        if (languageSelect) languageSelect.value = userPrefs.language;
-        
-        const themeSelect = document.querySelector('#themeSelect');
-        if (themeSelect) themeSelect.value = userPrefs.theme;
-        
-        const textSize = document.querySelector('#textSize');
-        if (textSize) textSize.value = userPrefs.textSize;
-        
-        const voiceSelect = document.querySelector('#voiceSelect');
-        if (voiceSelect) voiceSelect.value = userPrefs.voice;
-    }
-    loadPrefs();
 
-    // Sommaire
-    document.querySelectorAll('#sommaire .chapter-card').forEach((card, index) => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(20px)';
-        card.style.transition = `all 1s ease ${index * 0.1}s`;
-        setTimeout(() => {
-            card.style.opacity = '1';
-            card.style.transform = 'translateY(0)';
-        }, 100);
-        card.addEventListener('click', () => {
-            const chapter26 = card.dataset.chapter;
-            showSection('lecture');
-            document.getElementById(`chapter${chapter}`).scrollIntoView();
-        });
-    });
+    speechSynthesis.onvoiceschanged = populateVoiceList;
+    populateVoiceList();
 
-    // Favoris
-    function loadFavorites() {
-        const favoritesList = document.getElementById('favoritesList');
-        if (favoritesList && auth.currentUser) {
-            favoritesList.innerHTML = '';
-            db.collection('users').doc(auth.currentUser.uid).collection('favorites').get().then(snapshot => {
-                snapshot.forEach(doc => {
-                    const chapter = doc.data();
-                    const card = document.createElement('div');
-                    card.classList.add('chapter-card');
-                    card.dataset.chapter = chapter.id;
-                    card.innerHTML = `
-                        <h2>Chapitre ${chapter.id}: ${chapter.title}</h2>
-                        <div class="progress-bar"><div class="progress-bar-fill" style="width: ${chapter.progress}%"></div></div>
-                    `;
-                    favoritesList.appendChild(card);
-                    card.addEventListener('click', () => {
-                        showSection('lecture');
-                        document.getElementById(`chapter${chapter.id}`).scrollIntoView();
-                    });
-                });
-            });
-        }
-    }
-    document.getElementById('favoris')?.addEventListener('click', loadFavorites);
+    if (voiceToggle) {
+        voiceToggle.addEventListener('click', () => {
+            console.log('Clic lecture vocale');
+            const activeSection = document.querySelector('section.active');
+            if (!activeSection || activeSection.id === 'home' || activeSection.id === 'favorites' || activeSection.id === 'table-of-contents' || activeSection.id === 'profile') return;
 
-    // Lecture
-    const lectureSection = document.getElementById('lecture');
-    if (lectureSection) {
-        const themeToggle = document.getElementById('theme-toggle');
-        const themeIcon = document.querySelector('.theme-icon');
-        const zoomControls = document.getElementById('zoom-controls');
-        const bookContent = document.querySelector('.book-content');
-        const audioReader = document.getElementById('audio-reader');
-        const bookmarkBtn = document.getElementById('bookmark-btn');
-        const languageSwitcher = document.getElementById('language-switcher');
-        let fontSize = userPrefs.textSize;
-        let isReading = false;
+            const chapterId = activeSection.id;
+            const content = activeSection.querySelector(`.content[data-lang="${currentLanguage}"]`);
+            const text = Array.from(content.querySelectorAll('p')).map(p => p.textContent).join(' ');
 
-        themeToggle.addEventListener('click', () => {
-            lectureSection.classList.toggle('dark-mode');
-            themeIcon.classList.toggle('rotate-left');
-            themeIcon.textContent = lectureSection.classList.contains('dark-mode') ? 'brightness_7' : 'brightness_4';
-            userPrefs.theme = lectureSection.classList.contains('dark-mode') ? 'dark' : 'light';
-            savePrefs();
-        });
-
-        zoomControls.addEventListener('click', () => {
-            fontSize = fontSize >= 22 ? 16 : fontSize + 2;
-            bookContent.style.fontSize = fontSize + 'px';
-            zoomControls.querySelector('i').textContent = fontSize >= 22 ? 'zoom_out' : 'zoom_in';
-            userPrefs.textSize = fontSize;
-            savePrefs();
-        });
-
-        audioReader.addEventListener('click', () => {
-            isReading = !isReading;
-            if (isReading) {
-                const text = bookContent.textContent;
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = userPrefs.language;
-                utterance.voice = speechSynthesis.getVoices().find(v => v.name.includes(userPrefs.voice)) || null;
-                speechSynthesis.speak(utterance);
-                audioReader.querySelector('i').textContent = 'stop';
+            if (currentSpeech && currentChapter === chapterId && !speechSynthesis.paused) {
+                speechSynthesis.pause();
+                currentSpeech.paused = true;
+                voiceToggle.querySelector('.icon').textContent = '▶️';
+            } else if (currentSpeech && currentSpeech.paused) {
+                speechSynthesis.resume();
+                currentSpeech.paused = false;
+                voiceToggle.querySelector('.icon').textContent = '⏸️';
             } else {
-                speechSynthesis.cancel();
-                audioReader.querySelector('i').textContent = 'headphones';
+                if (currentSpeech) {
+                    speechSynthesis.cancel();
+                }
+                currentSpeech = new SpeechSynthesisUtterance(text);
+                currentSpeech.lang = currentLanguage === 'fr' ? 'fr-FR' : currentLanguage === 'en' ? 'en-US' : 'ar-SA';
+                currentSpeech.volume = volume / 100;
+                if (voiceSelect.value) {
+                    currentSpeech.voice = voices[parseInt(voiceSelect.value)];
+                }
+                currentSpeech.paused = false;
+                currentChapter = chapterId;
+                speechSynthesis.speak(currentSpeech);
+                voiceToggle.querySelector('.icon').textContent = '⏸️';
+                currentSpeech.onend = () => {
+                    voiceToggle.querySelector('.icon').textContent = '🔊';
+                    currentSpeech = null;
+                    currentChapter = null;
+                };
             }
         });
-
-        bookmarkBtn.addEventListener('click', () => {
-            const icon = bookmarkBtn.querySelector('i');
-            const chapterId = document.querySelector('.book-content section:target')?.id.replace('chapter', '') || '1';
-            if (icon.textContent === 'favorite_border' && auth.currentUser) {
-                db.collection('users').doc(auth.currentUser.uid).collection('favorites').doc(chapterId).set({
-                    id: chapterId,
-                    title: document.querySelector(`#chapter${chapterId} h1`).textContent,
-                    progress: 100
-                });
-                icon.textContent = 'favorite';
-                icon.style.color = '#e74c3c';
-            } else {
-                db.collection('users').doc(auth.currentUser.uid).collection('favorites').doc(chapterId).delete();
-                icon.textContent = 'favorite_border';
-                icon.style.color = '';
-            }
-        });
-
-        languageSwitcher.addEventListener('click', () => {
-            const langs = ['fr', 'en', 'ar'];
-            userPrefs.language = langs[(langs.indexOf(userPrefs.language) + 1) % langs.length];
-            savePrefs();
-            location.reload();
-        });
-
-        document.getElementById('back-btn').addEventListener('click', () => {
-            showSection('sommaire');
-        });
-
-        bookContent.addEventListener('scroll', () => {
-            const chapterId = document.querySelector('.book-content section:target')?.id.replace('chapter', '') || '1';
-            if (chapterId && auth.currentUser) {
-                const progress = Math.min(100, (bookContent.scrollTop / (bookContent.scrollHeight - bookContent.clientHeight)) * 100);
-                db.collection('users').doc(auth.currentUser.uid).collection('favorites').doc(chapterId).set({
-                    progress: progress
-                }, { merge: true });
-            }
-        });
-    }
-
-    // Paramètres
-    const parametresSection = document.getElementById('parametres');
-    if (parametresSection) {
-        const userName = document.getElementById('userName');
-        const userEmail = document.getElementById('userEmail');
-        const userPhone = document.getElementById('userPhone');
-        const resetPassword = document.getElementById('resetPassword');
-        const languageSelect = document.getElementById('languageSelect');
-        const textSize = document.getElementById('textSize');
-        const themeSelect = document.getElementById('themeSelect');
-        const voiceSelect = document.getElementById('voiceSelect');
-        const avatarUpload = document.getElementById('avatarUpload');
-        const userAvatar = document.getElementById('userAvatar');
-
-        userName.addEventListener('change', () => {
-            if (auth.currentUser) {
-                db.collection('users').doc(auth.currentUser.uid).set({ name: userName.value }, { merge: true });
-            }
-        });
-        userEmail.addEventListener('change', () => {
-            if (auth.currentUser) {
-                auth.currentUser.updateEmail(userEmail.value).catch(err => alert('Erreur email: ' + err.message));
-            }
-        });
-        userPhone.addEventListener('change', () => {
-            if (auth.currentUser) {
-                db.collection('users').doc(auth.currentUser.uid).set({ phone: userPhone.value }, { merge: true });
-            }
-        });
-        resetPassword.addEventListener('click', e => {
-            e.preventDefault();
-            if (auth.currentUser) {
-                auth.sendPasswordResetEmail(auth.currentUser.email).then(() => alert('Email de réinitialisation envoyé'));
-            }
-        });
-        languageSelect.addEventListener('change', () => {
-            userPrefs.language = languageSelect.value;
-            savePrefs();
-            location.reload();
-        });
-        textSize.addEventListener('input', () => {
-            userPrefs.textSize = parseInt(textSize.value);
-            savePrefs();
-            applyPrefs();
-        });
-        themeSelect.addEventListener('change', () => {
-            userPrefs.theme = themeSelect.value;
-            savePrefs();
-            applyPrefs();
-        });
-        voiceSelect.addEventListener('change', () => {
-            userPrefs.voice = voiceSelect.value;
-            savePrefs();
-        });
-        userAvatar.addEventListener('click', () => avatarUpload.click());
-        avatarUpload.addEventListener('change', () => {
-            if (avatarUpload.files[0] && auth.currentUser) {
-                const ref = storage.ref(`avatars/${auth.currentUser.uid}`);
-                ref.put(avatarUpload.files[0]).then(() => {
-                    ref.getDownloadURL().then(url => {
-                        userAvatar.src = url;
-                        db.collection('users').doc(auth.currentUser.uid).set({ avatar: url }, { merge: true });
-                    });
-                });
-            }
-        });
-        document.getElementById('backBtn').addEventListener('click', () => {
-            showSection(previousSection);
-        });
-    }
-
-    // Assistant IA
-    const aiAssistantBtn = document.getElementById('aiAssistantBtn');
-    if (aiAssistantBtn) {
-        const aiChatContainer = document.getElementById('aiChatContainer');
-        const aiCloseBtn = document.getElementById('aiCloseBtn');
-        const aiChatMessages = document.getElementById('aiChatMessages');
-        const aiUserInput = document.getElementById('aiUserInput');
-        const aiSendBtn = document.getElementById('aiSendBtn');
-        const aiTypingIndicator = document.getElementById('aiTypingIndicator');
-        const aiClearHistoryBtn = document.getElementById('aiClearHistoryBtn');
-
-        aiAssistantBtn.addEventListener('click', () => {
-            aiChatContainer.classList.toggle('active');
-            if (aiChatContainer.classList.contains('active')) {
-                aiUserInput.focus();
-                loadChatHistory();
-            }
-        });
-        aiCloseBtn.addEventListener('click', () => {
-            aiChatContainer.classList.remove('active');
-        });
-        function addMessage(text, sender) {
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('message', `${sender}-message`);
-            messageElement.textContent = text;
-            aiChatMessages.appendChild(messageElement);
-            aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
-            if (auth.currentUser) {
-                db.collection('users').doc(auth.currentUser.uid).collection('chatHistory').add({
-                    text: text,
-                    sender: sender,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-            }
-        }
-        function loadChatHistory() {
-            aiChatMessages.innerHTML = '';
-            if (auth.currentUser) {
-                db.collection('users').doc(auth.currentUser.uid).collection('chatHistory')
-                    .orderBy('timestamp').get().then(snapshot => {
-                        snapshot.forEach(doc => {
-                            const msg = doc.data();
-                            addMessage(msg.text, msg.sender);
-                        });
-                    });
-            }
-        }
-        aiClearHistoryBtn.addEventListener('click', () => {
-            if (auth.currentUser) {
-                db.collection('users').doc(auth.currentUser.uid).collection('chatHistory').get().then(snapshot => {
-                    snapshot.forEach(doc => doc.ref.delete());
-                    aiChatMessages.innerHTML = '';
-                });
-            }
-        });
-        async function sendMessage() {
-            const message = aiUserInput.value.trim();
-            if (!message) return;
-            addMessage(message, 'user');
-            aiUserInput.value = '';
-            aiTypingIndicator.classList.add('active');
-            aiUserInput.disabled = true;
-            aiSendBtn.disabled = true;
-            try {
-                const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{
-                            parts: [{ text: `Répondez en ${userPrefs.language} à une question sur le livre L’Aube Nouvelle: ${message}` }]
-                        }]
-                    })
-                });
-                const data = await response.json();
-                const reply = data.candidates[0].content.parts[0].text;
-                addMessage(reply, 'ai');
-            } catch (err) {
-                addMessage('Erreur: Impossible de contacter l’IA', 'ai');
-            }
-            aiTypingIndicator.classList.remove('active');
-            aiUserInput.disabled = false;
-            aiSendBtn.disabled = false;
-            aiUserInput.focus();
-        }
-        aiSendBtn.addEventListener('click', sendMessage);
-        aiUserInput.addEventListener('keypress', e => {
-            if (e.key === 'Enter') sendMessage();
-        });
-        setTimeout(() => {
-            addMessage(`Bonjour ! Je suis votre Assistant Premium. Posez-moi des questions sur L’Aube Nouvelle en ${userPrefs.language}.`, 'ai');
-        }, 1000);
-        setInterval(() => {
-            const halo = document.createElement('div');
-            halo.classList.add('halo-effect');
-            halo.style.position = 'absolute';
-            halo.style.width = '100%';
-            halo.style.height = '100%';
-            halo.style.background = 'radial-gradient(circle, rgba(255,215,0,0.4) 0%, rgba(255,215,0,0) 70%)';
-            halo.style.border-radius = '50%';
-            halo.style.top = '0';
-            halo.style.left = '0';
-            halo.style.opacity = '0';
-            halo.style.animation = 'haloPulse 3s infinite';
-            aiAssistantBtn.appendChild(halo);
-            setTimeout(() => halo.remove(), 3000);
-        }, 4000);
     }
 });
