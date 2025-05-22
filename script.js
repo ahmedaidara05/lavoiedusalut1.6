@@ -5,6 +5,65 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
+    // Gestion de l'assistant IA
+const aiAssistantIcon = document.getElementById('ai-assistant-icon');
+const aiChatBox = document.getElementById('ai-chat-box');
+const aiSendBtn = document.getElementById('ai-send-btn');
+const aiInput = document.getElementById('ai-input');
+const chatMessages = document.getElementById('chat-messages');
+
+if (aiAssistantIcon && aiChatBox) {
+    aiAssistantIcon.addEventListener('click', () => {
+        console.log('Clic sur l\'icône IA');
+        aiChatBox.classList.toggle('active'); // Affiche/masque la boîte de chat
+    });
+} else {
+    console.error('Icône IA ou boîte de chat non trouvée. Vérifiez les ID #ai-assistant-icon et #ai-chat-box dans le HTML.');
+}
+
+if (aiSendBtn && aiInput && chatMessages) {
+    aiSendBtn.addEventListener('click', async () => {
+        const question = aiInput.value.trim();
+        if (!question) {
+            console.log('Aucune question saisie');
+            return;
+        }
+        console.log('Envoi question IA:', question);
+
+        // Ajoute la question de l'utilisateur aux messages
+        const userMessage = document.createElement('div');
+        userMessage.textContent = `Vous: ${question}`;
+        chatMessages.appendChild(userMessage);
+
+        try {
+            // Exemple d'appel à une API IA (remplace par l'API réelle, par exemple xAI)
+            const response = await fetch('https://x.ai/api', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query: question })
+            });
+            const data = await response.json();
+            const aiResponse = data.response || 'Réponse de l\'IA non disponible';
+
+            // Ajoute la réponse de l'IA aux messages
+            const aiMessage = document.createElement('div');
+            aiMessage.textContent = `IA: ${aiResponse}`;
+            chatMessages.appendChild(aiMessage);
+
+            // Vide le champ de saisie
+            aiInput.value = '';
+            chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll en bas
+        } catch (error) {
+            console.error('Erreur API IA:', error);
+            const errorMessage = document.createElement('div');
+            errorMessage.textContent = 'Erreur: Impossible de contacter l\'IA';
+            chatMessages.appendChild(errorMessage);
+        }
+    });
+} else {
+    console.error('Bouton IA, champ de saisie ou zone de messages non trouvé. Vérifiez les ID #ai-send-btn, #ai-input, #chat-messages.');
+}
+    
     // Protection contre le copier-coller
     document.addEventListener('contextmenu', (e) => e.preventDefault());
     document.addEventListener('copy', (e) => e.preventDefault());
