@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Assistant IA</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: sans-serif;
+            background-color: #f0f0f0;
+        }
+
+        /* Style pour l'icône IA */
+        #ai-assistant-icon {
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            background-color: #1e3a8a; /* Couleur de fond bleu foncé */
+            color: white;
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            z-index: 1000;
+            cursor: grab;
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Style pour la boîte de chat */
+        #ai-chat-box {
+            display: none;
+            flex-direction: column;
+            position: fixed;
+            bottom: 150px;
+            right: 20px;
+            width: 300px;
+            height: 400px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        #ai-chat-box header {
+            padding: 10px;
+            background: #1e3a8a;
+            color: white;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        #chat-messages {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            background: #f0f0f0;
+        }
+
+        .chat-message {
+            margin: 6px 0;
+            padding: 8px 12px;
+            border-radius: 10px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .chat-user {
+            align-self: flex-end;
+            background: gold;
+            color: black;
+            margin-left: auto;
+        }
+
+        .chat-ai {
+            align-self: flex-start;
+            background: #000;
+            color: white;
+            margin-right: auto;
+        }
+
+        #ai-chat-box footer {
+            padding: 8px;
+            display: flex;
+            gap: 6px;
+            background: #f9f9f9;
+        }
+
+        #ai-input {
+            flex: 1;
+            padding: 6px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        #ai-send-btn {
+            padding: 6px 10px;
+            background: #1e3a8a;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        #ai-send-btn:hover {
+            background: #2b4cb3;
+        }
+    </style>
+</head>
+<body>
+    <!-- Icône de l'assistant IA -->
+    <div id="ai-assistant-icon" title="Assistant IA">🤖</div>
+
+    <!-- Boîte de chat -->
+    <div id="ai-chat-box">
+        <header>Assistant IA 📖</header>
+        <div id="chat-messages"></div>
+        <footer>
+            <input type="text" id="ai-input" placeholder="Pose une question sur le livre..." />
+            <button id="ai-send-btn">Envoyer</button>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const aiAssistantIcon = document.getElementById('ai-assistant-icon');
+            const aiChatBox = document.getElementById('ai-chat-box');
+            const aiSendBtn = document.getElementById('ai-send-btn');
+            const aiInput = document.getElementById('ai-input');
+            const chatMessages = document.getElementById('chat-messages');
+
+            // Gestion du clic sur l'icône pour ouvrir/fermer la boîte de chat
+            if (aiAssistantIcon && aiChatBox) {
+                aiAssistantIcon.addEventListener('click', () => {
+                    console.log('Clic sur l\'icône IA');
+                    aiChatBox.style.display = aiChatBox.style.display === 'none' ? 'flex' : 'none';
+                });
+            } else {
+                console.error('Icône IA ou boîte de chat non trouvée.');
+            }
+
+            // Gestion de l'envoi de messages
+            if (aiSendBtn && aiInput && chatMessages) {
+                aiSendBtn.addEventListener('click', () => {
+                    const message = aiInput.value.trim();
+                    if (message) {
+                        console.log('Message envoyé:', message);
+                        // Ajouter le message de l'utilisateur
+                        const userMessage = document.createElement('div');
+                        userMessage.className = 'chat-message chat-user';
+                        userMessage.textContent = message;
+                        chatMessages.appendChild(userMessage);
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                        // Simuler une réponse de l'IA
+                        const aiResponse = document.createElement('div');
+                        aiResponse.className = 'chat-message chat-ai';
+                        aiResponse.textContent = 'Réponse de l\'IA: Je traite votre question...';
+                        setTimeout(() => {
+                            chatMessages.appendChild(aiResponse);
+                            chatMessages.scrollTop = chatMessages.scrollHeight;
+                        }, 1000); // Simule un délai de réponse
+
+                        aiInput.value = ''; // Réinitialiser l'input
+                    }
+                });
+
+                // Envoyer avec la touche Entrée
+                aiInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        aiSendBtn.click();
+                    }
+                });
+            } else {
+                console.error('Éléments de chat non trouvés.');
+            }
+        });
+    </script>
+</body>
+</html>
