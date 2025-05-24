@@ -5,65 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // Gestion de l'assistant IA
-const aiAssistantIcon = document.getElementById('ai-assistant-icon');
-const aiChatBox = document.getElementById('ai-chat-box');
-const aiSendBtn = document.getElementById('ai-send-btn');
-const aiInput = document.getElementById('ai-input');
-const chatMessages = document.getElementById('chat-messages');
-
-if (aiAssistantIcon && aiChatBox) {
-    aiAssistantIcon.addEventListener('click', () => {
-        console.log('Clic sur l\'icône IA');
-        aiChatBox.classList.toggle('active'); // Affiche/masque la boîte de chat
-    });
-} else {
-    console.error('Icône IA ou boîte de chat non trouvée. Vérifiez les ID #ai-assistant-icon et #ai-chat-box dans le HTML.');
-}
-
-if (aiSendBtn && aiInput && chatMessages) {
-    aiSendBtn.addEventListener('click', async () => {
-        const question = aiInput.value.trim();
-        if (!question) {
-            console.log('Aucune question saisie');
-            return;
-        }
-        console.log('Envoi question IA:', question);
-
-        // Ajoute la question de l'utilisateur aux messages
-        const userMessage = document.createElement('div');
-        userMessage.textContent = `Vous: ${question}`;
-        chatMessages.appendChild(userMessage);
-
-        try {
-            // Exemple d'appel à une API IA (remplace par l'API réelle, par exemple xAI)
-            const response = await fetch('https://x.ai/api', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ query: question })
-            });
-            const data = await response.json();
-            const aiResponse = data.response || 'Réponse de l\'IA non disponible';
-
-            // Ajoute la réponse de l'IA aux messages
-            const aiMessage = document.createElement('div');
-            aiMessage.textContent = `IA: ${aiResponse}`;
-            chatMessages.appendChild(aiMessage);
-
-            // Vide le champ de saisie
-            aiInput.value = '';
-            chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll en bas
-        } catch (error) {
-            console.error('Erreur API IA:', error);
-            const errorMessage = document.createElement('div');
-            errorMessage.textContent = 'Erreur: Impossible de contacter l\'IA';
-            chatMessages.appendChild(errorMessage);
-        }
-    });
-} else {
-    console.error('Bouton IA, champ de saisie ou zone de messages non trouvé. Vérifiez les ID #ai-send-btn, #ai-input, #chat-messages.');
-}
-    
     // Protection contre le copier-coller
     document.addEventListener('contextmenu', (e) => e.preventDefault());
     document.addEventListener('copy', (e) => e.preventDefault());
@@ -589,4 +530,120 @@ if (aiSendBtn && aiInput && chatMessages) {
             }
         });
     }
+
+    // --- New Hamburger Menu Functionality ---
+    const hamburgerMenuBtn = document.getElementById('hamburger-menu-btn');
+    const dropdownMenu = document.getElementById('dropdown-menu');
+
+    if (hamburgerMenuBtn && dropdownMenu) {
+        hamburgerMenuBtn.addEventListener('click', (event) => {
+            console.log('Clic bouton hamburger');
+            dropdownMenu.classList.toggle('show'); // Toggle the 'show' class
+            event.stopPropagation(); // Prevent the click from immediately closing the menu
+        });
+
+        // Close the dropdown menu if a click occurs outside of it
+        document.addEventListener('click', (event) => {
+            if (!dropdownMenu.contains(event.target) && !hamburgerMenuBtn.contains(event.target)) {
+                if (dropdownMenu.classList.contains('show')) {
+                    dropdownMenu.classList.remove('show');
+                    console.log('Menu hamburger fermé en cliquant à l\'extérieur.');
+                }
+            }
+        });
+
+        // Close the dropdown menu when an item inside it is clicked
+        dropdownMenu.querySelectorAll('button, select').forEach(item => {
+            item.addEventListener('click', () => {
+                dropdownMenu.classList.remove('show');
+                console.log('Menu hamburger fermé après sélection.');
+            });
+        });
+    }
+});
+
+const apiKey = "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";
+
+document.getElementById("chat-icon").onclick = () => {
+  const window = document.getElementById("chat-window");
+  window.style.display = window.style.display === "flex" ? "none" : "flex";
+};
+
+async function askBookAI() {
+  const input = document.getElementById("chat-question");
+  const messagesDiv = document.getElementById("chat-messages");
+  const question = input.value.trim();
+  input.value = "";
+  if (!question) return;
+
+  // Ajoute le message utilisateur
+  const userMsg = document.createElement("div");
+  userMsg.className = "message-user";
+  userMsg.textContent = question;
+  messagesDiv.appendChild(userMsg);
+
+  // Message en attente
+  const thinkingMsg = document.createElement("div");
+  thinkingMsg.className = "message-ai";
+  thinkingMsg.textContent = "Réfléchit...";
+  messagesDiv.appendChild(thinkingMsg);
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+  const bookText = document.getElementById("book-content").innerText;
+
+  try {
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "openai/gpt-3.5-turbo",
+        messages: [
+          {
+            role: "system",
+            content: "Tu es un assistant littéraire. Tu dois répondre uniquement selon le contenu du livre fourni par l'utilisateur."
+          },
+          {
+            role: "user",
+            content: `Voici le contenu du livre : """${bookText}"""\nVoici ma question : ${question}`
+          }
+        ]
+      })
+    });
+
+    const data = await response.json();
+    const reply = data.choices?.[0]?.message?.content || "❌ Pas de réponse";
+
+    thinkingMsg.remove(); // Retire "Réfléchit..."
+    const aiMsg = document.createElement("div");
+    aiMsg.className = "message-ai";
+    aiMsg.textContent = reply;
+    messagesDiv.appendChild(aiMsg);
+  } catch (err) {
+    thinkingMsg.textContent = "❌ Erreur de l'IA.";
+  }
+
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+// Permet de déplacer le bouton
+const chatIcon = document.getElementById("chat-icon");
+let isDragging = false;
+
+chatIcon.addEventListener("mousedown", (e) => {
+  isDragging = true;
+});
+
+document.addEventListener("mousemove", (e) => {
+  if (!isDragging) return;
+  chatIcon.style.left = e.pageX - 30 + "px";
+  chatIcon.style.top = e.pageY - 30 + "px";
+  chatIcon.style.bottom = "auto";
+  chatIcon.style.right = "auto";
+});
+
+document.addEventListener("mouseup", () => {
+  isDragging = false;
 });
